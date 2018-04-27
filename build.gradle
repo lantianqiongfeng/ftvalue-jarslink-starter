@@ -1,0 +1,114 @@
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.5'
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+
+repositories {
+    mavenCentral()
+    maven {
+        credentials {
+            username 'deploy'
+            password 'Value888'
+        }
+        url 'http://106.14.251.153:18081/nexus/content/repositories/snapshots/'
+    }
+    maven {
+        credentials {
+            username 'deploy'
+            password 'Value888'
+        }
+        url 'http://106.14.251.153:18081/nexus/content/repositories/releases/'
+    }
+}
+
+uploadArchives {
+    configuration = configurations.archives
+    repositories.mavenDeployer {
+        beforeDeployment { MavenDeployment deployment }
+        repository(url: 'http://106.14.251.153:18081/nexus/content/repositories/snapshots/') {
+            authentication(userName: "deploy", password: "Value888")
+        }
+
+        pom.project {
+            name 'ftvalue-library'
+            packaging 'aar'
+            description 'none'
+            url 'http://106.14.251.153:18081/nexus/content/repositories/snapshots/'
+            groupId 'com.ftvalue'
+            artifactId 'ftvalue-jarslink-starter'
+            version '1.0.0-SNAPSHOT'
+        }
+    }
+}
+
+group 'com.ftvalue'
+version '1.0.0-SNAPSHOT'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+dependencies {
+    compile 'org.springframework.boot:spring-boot:1.5.9.RELEASE'
+    compile 'com.alipay.jarslink:jarslink-api:1.6.1.20180301'
+    compile 'org.yaml:snakeyaml:1.21'
+
+}
+
+
+test {
+    testLogging {
+        showStandardStreams = true
+    }
+}
+
+// 打包源文件
+task sourceJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+}
+
+artifacts {
+    archives jar
+    archives sourceJar
+}
+
+publishing {
+
+    publications {
+        mavenJava(MavenPublication) {
+            // 设置gav属性
+            groupId project.group
+            artifactId project.name
+            version project.version
+
+            from components.java
+            artifact sourceJar
+
+            // 设置pom相关信息
+            pom.withXml {
+                Node root = asNode()
+                root.appendNode('description', 'ftvalue-jarlink!')
+            }
+        }
+    }
+
+}
+
+//生成一个元的pom文件
+model {
+    tasks.generatePomFileForMavenJavaPublication {
+        destination = file("$buildDir/resources/main/META-INF/com.ftvalue/ftvalue-jarlink-spring-boot-starter/pom.xml")
+    }
+}
