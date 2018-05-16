@@ -1,12 +1,13 @@
-package com.ftvalue.jarslink;
+package com.ftvalue.jarslink.utils;
 
-import com.ftvalue.jarslink.service.ModuleRefreshSchedulerImpl;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 import org.yaml.snakeyaml.Yaml;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -18,15 +19,24 @@ public class YmlUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(YmlUtils.class);
 
-    public static Map<String, Object> readYml(JarFile jarFile) {
+    public static Map<String, Object> readYml(JarFile jarFile,String configPath,String jarName) {
         try {
-            JarEntry entry = jarFile.getJarEntry("application.yml");
-            if(entry != null) {
-                InputStream input = jarFile.getInputStream(entry);
+            File configFile = new File(configPath + File.separator + jarName + File.separator + "application.yml");
+            if(configFile.exists()) {
+                InputStream input = new FileInputStream(configFile);
                 Yaml yaml = new Yaml();
                 Map map = yaml.loadAs(input,Map.class);
                 Map<String, Object> properties = getFlattenedMap(map);
                 return properties;
+            }else {
+                JarEntry entry = jarFile.getJarEntry("application.yml");
+                if(entry != null) {
+                    InputStream input = jarFile.getInputStream(entry);
+                    Yaml yaml = new Yaml();
+                    Map map = yaml.loadAs(input,Map.class);
+                    Map<String, Object> properties = getFlattenedMap(map);
+                    return properties;
+                }
             }
         } catch (IOException e) {
             LOGGER.info("read yml error [{}]",e);

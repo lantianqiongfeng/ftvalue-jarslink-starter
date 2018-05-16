@@ -8,6 +8,8 @@ public class JarslinkProperties {
 
     private String jarPath;
 
+    private String configPath;
+
     private int jarInitialDelay = 20;
 
     private int jarRefreshDelay = 60;
@@ -34,5 +36,13 @@ public class JarslinkProperties {
 
     public void setJarRefreshDelay(int jarRefreshDelay) {
         this.jarRefreshDelay = jarRefreshDelay;
+    }
+
+    public String getConfigPath() {
+        return configPath;
+    }
+
+    public void setConfigPath(String configPath) {
+        this.configPath = configPath;
     }
 }

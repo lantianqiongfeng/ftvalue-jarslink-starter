@@ -27,9 +27,10 @@ public class JarslinkParseAutoConfiguration {
     @Bean
     public ModuleRefreshSchedulerImpl buildModuleRefreshScheduler() {
         ModuleRefreshSchedulerImpl moduleRefreshScheduler =
-                 new ModuleRefreshSchedulerImpl(jarslinkProperties.getJarPath(),
-                         jarslinkProperties.getJarInitialDelay(),
-                         jarslinkProperties.getJarRefreshDelay());
+                new ModuleRefreshSchedulerImpl(jarslinkProperties.getJarPath(),
+                        jarslinkProperties.getConfigPath(),
+                        jarslinkProperties.getJarInitialDelay(),
+                        jarslinkProperties.getJarRefreshDelay());
         moduleRefreshScheduler.setModuleLoader(moduleLoader);
         moduleRefreshScheduler.setModuleManager(moduleManager);
         return moduleRefreshScheduler;
